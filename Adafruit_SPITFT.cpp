@@ -1002,7 +1002,12 @@ void Adafruit_SPITFT::writePixels(uint16_t *colors, uint32_t len, bool block,
   (void)block;
   (void)bigEndian;
 
-#if defined(ESP32)
+#if defined(ARDUINO_SILABS)
+  if (connection == TFT_HARD_SPI) {
+    hwspi._spi->transfer((uint8_t*)colors, 2 * len, true);
+    return;
+  }
+#elif defined(ESP32)
   if (connection == TFT_HARD_SPI) {
     if (!bigEndian) {
       hwspi._spi->writePixels(colors, len * 2); // Inbuilt endian-swap
